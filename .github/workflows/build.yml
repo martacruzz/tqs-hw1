@@ -35,7 +35,7 @@ jobs:
         run: |
           cd monos_clean_api
           mvn spring-boot:run -Dspring-boot.run.profiles=e2e &
-          sleep 10
+          sleep 15
 
       # Verify backend is ready
       - name: Wait for backend to be ready
