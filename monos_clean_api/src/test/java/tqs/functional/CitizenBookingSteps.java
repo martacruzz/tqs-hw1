@@ -22,7 +22,7 @@ public class CitizenBookingSteps {
     @Before
     public void setUp() {
         Playwright playwright = Playwright.create();
-        browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));
+        browser = playwright.chromium().launch();
         context = browser.newContext();
         page = context.newPage();
     }
