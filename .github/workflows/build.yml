@@ -37,11 +37,6 @@ jobs:
           mvn spring-boot:run -Dspring-boot.run.profiles=e2e &
           sleep 15
 
-      # Verify backend is ready
-      - name: Wait for backend to be ready
-        run: |
-          timeout 30s bash -c 'until curl -s http://localhost:8080/api/municipalities | grep -q "UP"; do sleep 2; echo "Waiting for backend..."; done'
-
       # Build and serve frontend
       - name: Build and serve frontend
         run: |
