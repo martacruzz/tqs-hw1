@@ -2,7 +2,6 @@ package tqs.functional;
 
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
-import io.cucumber.java.Scenario;
 import io.cucumber.java.en.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -51,6 +50,9 @@ public class CitizenBookingSteps {
     @When("I select municipality {string}")
     public void selectMunicipality(String municipality) {
         page.waitForSelector("select[name='municipality'] option");
+
+        page.waitForSelector(String.format("select[name='municipality'] option[value='%s']", municipality),
+                new Page.WaitForSelectorOptions().setTimeout(30000));
         page.selectOption("select[name='municipality']", municipality);
     }
 
