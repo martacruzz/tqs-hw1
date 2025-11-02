@@ -12,3 +12,7 @@ spring:
   h2:
     console:
       enabled: false
+
+# Keep server.port = 8080 (same as main)
+server:
+  port: 8080
