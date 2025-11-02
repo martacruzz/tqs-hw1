@@ -21,6 +21,7 @@
         <cucumber.version>7.20.1</cucumber.version>
         <scala.version>2.13.12</scala.version>
         <gatling.version>3.10.4</gatling.version>
+        <sonar.organization>martacruzz</sonar.organization>
     </properties>
 
     <dependencies>
