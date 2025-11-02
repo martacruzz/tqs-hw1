@@ -33,14 +33,6 @@ public class CitizenBookingSteps {
         browser.close();
     }
 
-    @After
-    public void embedScreenshot(Scenario scenario) {
-        if (scenario.isFailed()) {
-            byte[] screenshot = page.screenshot();
-            scenario.attach(screenshot, "image/png", "screenshot");
-        }
-    }
-
     @Given("I am on the new booking page")
     public void goToBookingPage() {
         page.navigate("http://localhost:5173");

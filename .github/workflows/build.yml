@@ -47,9 +47,7 @@ jobs:
           sleep 5
 
       - name: Install Playwright browsers and dependencies
-        run: |
-          npx playwright install-deps
-          npx playwright install
+        run: npx playwright install-deps chromium
 
       # Run Playwright E2E tests
       - name: Run E2E tests
