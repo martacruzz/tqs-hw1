@@ -26,6 +26,7 @@ Postman or curl
 For this project, I decided to have the backend running on a docker container with the Spring boot application and the database server.
 To run the spring boot application:
 ```
+mvn clean package -DskipTests 
 docker compose up --build
 ```
 ## Frontend

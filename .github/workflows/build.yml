@@ -61,7 +61,7 @@ jobs:
       - name: Run E2E tests
         run: |
           cd monos_clean_api
-          mvn test -Dtest=RunCucumberTest
+          mvn test -Dtest=RunCucumberTest -Dsurefire.redirectTestOutputToFile=false
 
       - name: Upload screenshots
         if: failure()
