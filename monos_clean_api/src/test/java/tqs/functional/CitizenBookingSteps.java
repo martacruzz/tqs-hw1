@@ -2,6 +2,7 @@ package tqs.functional;
 
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
+import io.cucumber.java.Scenario;
 import io.cucumber.java.en.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -30,6 +31,14 @@ public class CitizenBookingSteps {
     @After
     public void tearDown() {
         browser.close();
+    }
+
+    @After
+    public void embedScreenshot(Scenario scenario) {
+        if (scenario.isFailed()) {
+            byte[] screenshot = page.screenshot();
+            scenario.attach(screenshot, "image/png", "screenshot");
+        }
     }
 
     @Given("I am on the new booking page")
