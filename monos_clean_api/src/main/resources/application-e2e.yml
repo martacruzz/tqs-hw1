@@ -16,3 +16,8 @@ spring:
 # Keep server.port = 8080 (same as main)
 server:
   port: 8080
+
+logging:
+  level:
+    tqs: DEBUG
+    org.springframework.web: DEBUG
