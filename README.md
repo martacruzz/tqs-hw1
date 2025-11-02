@@ -51,3 +51,5 @@ For performance tests:
 mvn gatling:test
 ```
 Note: when running the performace tests don't forget to build the docker container without the volums (if any prior tests were made)
+Github actions:
+When pushing don't forget to have the frontend web server running locally
