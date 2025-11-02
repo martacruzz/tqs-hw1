@@ -49,6 +49,7 @@ public class CitizenBookingSteps {
 
     @When("I select municipality {string}")
     public void selectMunicipality(String municipality) {
+        page.waitForSelector("select[name='municipality'] option");
         page.selectOption("select[name='municipality']", municipality);
     }
 
