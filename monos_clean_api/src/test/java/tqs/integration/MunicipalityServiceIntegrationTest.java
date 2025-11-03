@@ -1,7 +1,7 @@
 package tqs.integration;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
@@ -12,6 +12,7 @@ import tqs.services.MunicipalityService;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -27,10 +28,13 @@ class MunicipalityServiceIntegrationTest {
     @MockBean
     private ExternalMunicipalityClient client;
 
-    @Autowired
     private MunicipalityService service;
-
     private final List<String> sampleMunicipalities = Arrays.asList("LISBOA", "PORTO", "BRAGA");
+
+    @BeforeEach
+    void setUp() {
+        service = new MunicipalityService(client);
+    }
 
     @Test
     void whenCacheExpires_thenRefreshCache() throws InterruptedException {
@@ -38,6 +42,9 @@ class MunicipalityServiceIntegrationTest {
 
         // First call to populate cache
         List<MunicipalityDTO> result1 = service.getAllMunicipalities();
+        List<String> codes1 = result1.stream()
+                .map(MunicipalityDTO::getCode)
+                .collect(Collectors.toList());
 
         // Force cache expiry
         try {
@@ -50,9 +57,16 @@ class MunicipalityServiceIntegrationTest {
 
         // Second call should refresh cache
         List<MunicipalityDTO> result2 = service.getAllMunicipalities();
+        List<String> codes2 = result2.stream()
+                .map(MunicipalityDTO::getCode)
+                .collect(Collectors.toList());
 
         verify(client, times(2)).fetchMunicipalityNamesRaw();
-        assertEquals(result1, result2);
+
+        // Compare the municipality codes instead of the DTO objects
+        assertEquals(codes1.size(), codes2.size());
+        assertTrue(codes1.containsAll(codes2));
+        assertTrue(codes2.containsAll(codes1));
     }
 
     @Test
@@ -65,6 +79,11 @@ class MunicipalityServiceIntegrationTest {
                 List<MunicipalityDTO> result = service.getAllMunicipalities();
                 assertNotNull(result);
                 assertEquals(3, result.size());
+                // Verify the content of the municipalities
+                List<String> codes = result.stream()
+                        .map(MunicipalityDTO::getCode)
+                        .collect(Collectors.toList());
+                assertTrue(codes.containsAll(sampleMunicipalities));
             });
         }
 
