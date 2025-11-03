@@ -20,6 +20,7 @@ import tqs.services.BookingService;
 @RestController
 @RequestMapping("/api/staff/bookings")
 public class StaffBookingController {
+
     private final BookingService service;
 
     @Autowired
@@ -29,30 +30,32 @@ public class StaffBookingController {
 
     @GetMapping
     public ResponseEntity<List<BookingResponseDTO>> getAllBookings() {
-        List<BookingResponseDTO> bookings = service.getBookingsByDateRange(LocalDate.now().minusDays(7),
+        List<BookingResponseDTO> bookings = service.getBookingsByDateRange(
+                LocalDate.now().minusDays(7),
                 LocalDate.now().plusDays(14));
         return ResponseEntity.ok(bookings);
     }
 
     @GetMapping(params = "municipality")
-    public ResponseEntity<List<BookingResponseDTO>> getBookingsByMunicipalityAndDate(@RequestParam String municipality,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-
+    public ResponseEntity<List<BookingResponseDTO>> getBookingsByMunicipalityAndDate(
+            @RequestParam("municipality") String municipality,
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         List<BookingResponseDTO> bookings = service.getBookingsByMunicipalityByDate(municipality, date);
         return ResponseEntity.ok(bookings);
     }
 
     @GetMapping(params = "status")
-    public ResponseEntity<List<BookingResponseDTO>> getBookingsByStatus(@RequestParam Status status) {
+    public ResponseEntity<List<BookingResponseDTO>> getBookingsByStatus(
+            @RequestParam("status") Status status) {
         List<BookingResponseDTO> bookings = service.getBookingsByStatus(status);
         return ResponseEntity.ok(bookings);
     }
 
     @PatchMapping("/{token}/update")
-    public ResponseEntity<BookingResponseDTO> updateBooking(@PathVariable String token,
-            @RequestParam Status newStatus) {
+    public ResponseEntity<BookingResponseDTO> updateBooking(
+            @PathVariable("token") String token,
+            @RequestParam("newStatus") Status newStatus) {
         BookingResponseDTO updated = service.updateBookingStatus(token, newStatus);
         return ResponseEntity.ok(updated);
     }
-
 }

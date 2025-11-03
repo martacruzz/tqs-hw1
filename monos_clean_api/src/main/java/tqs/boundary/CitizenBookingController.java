@@ -34,13 +34,14 @@ public class CitizenBookingController {
     }
 
     @GetMapping("/{token}")
-    public ResponseEntity<BookingResponseDTO> getBooking(@PathVariable String token) {
+    public ResponseEntity<BookingResponseDTO> getBooking(@PathVariable("token") String token) {
+        System.out.println("🔍 Received token: " + token);
         BookingResponseDTO response = service.getBookingByToken(token);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{token}")
-    public ResponseEntity<BookingResponseDTO> cancelBooking(@PathVariable String token) {
+    public ResponseEntity<BookingResponseDTO> cancelBooking(@PathVariable("token") String token) {
         service.cancelBookingByToken(token);
         return ResponseEntity.noContent().build();
     }
