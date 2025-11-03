@@ -106,4 +106,4 @@ jobs:
             -Dsonar.projectKey=martacruzz_tqs-hw1 \
             -Dsonar.organization=martacruzz \
             -Dsonar.host.url=https://sonarcloud.io \
-            -Dsurefire.excludes=**/*IntegrationTest.java
+            -Dsurefire.excludes=**/functional/**/*.java
