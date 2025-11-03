@@ -82,7 +82,9 @@ public class BookingServiceImpl implements BookingService {
 
         booking.addStatusHistory(Status.CANCELLED);
         repo.save(booking);
-        logger.info("Booking under token {} was cancelled", token);
+
+        String safeToken = sanitizeForLog(token);
+        logger.info("Booking under token {} was cancelled", safeToken);
     }
 
     @Override
@@ -182,6 +184,15 @@ public class BookingServiceImpl implements BookingService {
 
         dto.setHistory(history);
         return dto;
+    }
+
+    // this function is to fix a security logging issue pointed out by sonar
+    private String sanitizeForLog(String input) {
+        if (input == null) {
+            return "";
+        }
+        // allow only uppercase letters and numbers -- normal aspect of token
+        return input.matches("^[A-Z0-9]{20}$") ? input : "[INVALID_TOKEN_FORMAT]";
     }
 
 }

@@ -40,13 +40,13 @@ class MunicipalityServiceIntegrationTest {
     void whenCacheExpires_thenRefreshCache() throws InterruptedException {
         when(client.fetchMunicipalityNamesRaw()).thenReturn(sampleMunicipalities);
 
-        // First call to populate cache
+        // first call -- populate cache
         List<MunicipalityDTO> result1 = service.getAllMunicipalities();
         List<String> codes1 = result1.stream()
                 .map(MunicipalityDTO::getCode)
                 .collect(Collectors.toList());
 
-        // Force cache expiry
+        // force cache expiry
         try {
             java.lang.reflect.Field cacheExpiryField = MunicipalityService.class.getDeclaredField("cacheExpiry");
             cacheExpiryField.setAccessible(true);
@@ -55,7 +55,7 @@ class MunicipalityServiceIntegrationTest {
             fail("Could not manipulate cache expiry");
         }
 
-        // Second call should refresh cache
+        // second call -- should refresh cache
         List<MunicipalityDTO> result2 = service.getAllMunicipalities();
         List<String> codes2 = result2.stream()
                 .map(MunicipalityDTO::getCode)
@@ -63,7 +63,7 @@ class MunicipalityServiceIntegrationTest {
 
         verify(client, times(2)).fetchMunicipalityNamesRaw();
 
-        // Compare the municipality codes instead of the DTO objects
+        // compare municipality codes
         assertEquals(codes1.size(), codes2.size());
         assertTrue(codes1.containsAll(codes2));
         assertTrue(codes2.containsAll(codes1));
