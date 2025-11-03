@@ -1,7 +1,7 @@
 package tqs.integration;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
@@ -21,13 +21,10 @@ class MunicipalityServiceIntegrationTest {
     @MockBean
     private ExternalMunicipalityClient client;
 
+    @Autowired
     private MunicipalityService service;
-    private final List<String> sampleMunicipalities = Arrays.asList("LISBOA", "PORTO", "BRAGA");
 
-    @BeforeEach
-    void setUp() {
-        service = new MunicipalityService(client);
-    }
+    private final List<String> sampleMunicipalities = Arrays.asList("LISBOA", "PORTO", "BRAGA");
 
     @Test
     void whenCacheExpires_thenRefreshCache() throws InterruptedException {
