@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import tqs.dto.MunicipalityDTO;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
 public class MunicipalityService {
 
     private final ExternalMunicipalityClient client;
-    private volatile List<MunicipalityDTO> cachedMunicipalities = null;
+    private volatile List<MunicipalityDTO> cachedMunicipalities = Collections.emptyList();
     private volatile long cacheExpiry = 0;
     private static final long CACHE_TTL_MS = TimeUnit.HOURS.toMillis(1);
 
