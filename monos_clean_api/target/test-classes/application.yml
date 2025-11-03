@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:e2edb
+    url: jdbc:h2:mem:testdb
     driver-class-name: org.h2.Driver
     username: sa
     password: ''
@@ -9,6 +9,9 @@ spring:
     hibernate:
       ddl-auto: create-drop
     show-sql: false
+  h2:
+    console:
+      enabled: false
 
 server:
   port: 8080
