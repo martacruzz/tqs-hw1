@@ -1,4 +1,4 @@
-package tqs;
+package tqs.unit;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -193,6 +193,74 @@ class BookingServiceImplTest {
         String token2 = bookingService.generateToken();
         assertThat(token1).isNotEqualTo(token2);
         assertThat(token1).matches("^[A-Z0-9]{20}$");
+    }
+
+    @Test
+    void shouldGetBookingsByDateRange() {
+        LocalDate start = LocalDate.now();
+        LocalDate end = LocalDate.now().plusDays(7);
+        List<BookingRequest> mockBookings = Arrays.asList(
+                createMockBooking("LISBOA", start.plusDays(1)),
+                createMockBooking("PORTO", start.plusDays(2)));
+
+        when(bookingRepo.findByCollectionDateBetween(start, end)).thenReturn(mockBookings);
+
+        List<BookingResponseDTO> result = bookingService.getBookingsByDateRange(start, end);
+
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getMunicipality()).isEqualTo("LISBOA");
+        assertThat(result.get(1).getMunicipality()).isEqualTo("PORTO");
+        verify(bookingRepo).findByCollectionDateBetween(start, end);
+    }
+
+    @Test
+    void shouldGetBookingByToken() {
+        BookingRequest mockBooking = createMockBooking("LISBOA", LocalDate.now());
+        when(bookingRepo.findByToken("TOKEN123")).thenReturn(Optional.of(mockBooking));
+
+        BookingResponseDTO result = bookingService.getBookingByToken("TOKEN123");
+
+        assertThat(result).isNotNull();
+        assertThat(result.getMunicipality()).isEqualTo("LISBOA");
+        assertThat(result.getToken()).isEqualTo("TOKEN");
+        verify(bookingRepo).findByToken("TOKEN123");
+    }
+
+    @Test
+    void shouldThrowWhenGettingNonExistentBooking() {
+        when(bookingRepo.findByToken("UNKNOWN")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> bookingService.getBookingByToken("UNKNOWN"))
+                .isInstanceOf(InvalidBookingException.class)
+                .hasMessage("No booking found under token: UNKNOWN");
+    }
+
+    @Test
+    void shouldThrowWhenUpdatingToInvalidStatus() {
+        BookingRequest booking = new BookingRequest();
+        booking.setToken("TOKEN123");
+        booking.setStatus(Status.COMPLETED); // COMPLETED can't transition to any other status
+        when(bookingRepo.findByToken("TOKEN123")).thenReturn(Optional.of(booking));
+
+        assertThatThrownBy(() -> bookingService.updateBookingStatus("TOKEN123", Status.ASSIGNED))
+                .isInstanceOf(InvalidBookingException.class)
+                .hasMessage("Cannot update booking status COMPLETED to status ASSIGNED");
+
+        verify(bookingRepo, never()).save(any());
+    }
+
+    @Test
+    void shouldUpdateToValidNextStatus() {
+        BookingRequest booking = new BookingRequest();
+        booking.setToken("TOKEN123");
+        booking.setStatus(Status.RECEIVED); // RECEIVED can transition to ASSIGNED
+        when(bookingRepo.findByToken("TOKEN123")).thenReturn(Optional.of(booking));
+
+        BookingResponseDTO result = bookingService.updateBookingStatus("TOKEN123", Status.ASSIGNED);
+
+        assertThat(result.getStatus()).isEqualTo(Status.ASSIGNED);
+        assertThat(result.getHistory()).hasSize(1);
+        verify(bookingRepo).save(booking);
     }
 
     // helper function

@@ -74,7 +74,6 @@ public class BookingRequest {
 
     public BookingRequest() {
         this.createdAt = LocalDateTime.now();
-        // TODO check if we need to add updatedAt here
         this.status = Status.RECEIVED;
     }
 
