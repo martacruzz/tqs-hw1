@@ -8,43 +8,46 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class MunicipalityService {
-
     private final ExternalMunicipalityClient client;
-    private volatile List<MunicipalityDTO> cachedMunicipalities = Collections.emptyList();
+    private final AtomicReference<List<MunicipalityDTO>> cachedMunicipalities;
     private volatile long cacheExpiry = 0;
     private static final long CACHE_TTL_MS = TimeUnit.HOURS.toMillis(1);
 
     public MunicipalityService(ExternalMunicipalityClient client) {
         this.client = client;
+        this.cachedMunicipalities = new AtomicReference<>(Collections.emptyList());
     }
 
     private void refreshCacheIfNeeded() {
-        if (cachedMunicipalities == null || System.currentTimeMillis() > cacheExpiry) {
+        if (System.currentTimeMillis() > cacheExpiry || cachedMunicipalities.get().isEmpty()) {
             synchronized (this) {
-                if (cachedMunicipalities == null || System.currentTimeMillis() > cacheExpiry) {
+                if (System.currentTimeMillis() > cacheExpiry || cachedMunicipalities.get().isEmpty()) {
                     List<String> names = client.fetchMunicipalityNamesRaw();
-                    this.cachedMunicipalities = names.stream()
-                            .map(name -> new MunicipalityDTO(name))
-                            .collect(Collectors.toList());
-                    this.cacheExpiry = System.currentTimeMillis() + CACHE_TTL_MS;
+                    List<MunicipalityDTO> municipalities = names.stream()
+                            .map(MunicipalityDTO::new)
+                            .collect(Collectors.toUnmodifiableList());
+                    cachedMunicipalities.set(municipalities);
+                    cacheExpiry = System.currentTimeMillis() + CACHE_TTL_MS;
                 }
             }
         }
     }
 
     public boolean isValid(String code) {
-        if (code == null)
+        if (code == null) {
             return false;
+        }
         refreshCacheIfNeeded();
-        return cachedMunicipalities.stream()
+        return cachedMunicipalities.get().stream()
                 .anyMatch(dto -> dto.getCode().equals(code.toUpperCase()));
     }
 
     public List<MunicipalityDTO> getAllMunicipalities() {
         refreshCacheIfNeeded();
-        return cachedMunicipalities;
+        return cachedMunicipalities.get();
     }
 }
