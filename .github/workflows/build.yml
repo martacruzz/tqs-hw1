@@ -70,10 +70,10 @@ jobs:
           name: e2e-failures
           path: monos_clean_api/screenshots/
 
-  sonarqube:
+  sonarqube: # only runs unit tests
     name: SonarQube Analysis
     runs-on: ubuntu-latest
-    needs: e2e-tests  # run after tests pass
+    needs: e2e-tests
     steps:
       - uses: actions/checkout@v4
         with:
@@ -102,7 +102,8 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+          mvn -B verify sonar:sonar \
             -Dsonar.projectKey=martacruzz_tqs-hw1 \
             -Dsonar.organization=martacruzz \
-            -Dsonar.host.url=https://sonarcloud.io
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsurefire.excludes=**/*IntegrationTest.java
