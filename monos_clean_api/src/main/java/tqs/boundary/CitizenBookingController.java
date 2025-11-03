@@ -35,7 +35,6 @@ public class CitizenBookingController {
 
     @GetMapping("/{token}")
     public ResponseEntity<BookingResponseDTO> getBooking(@PathVariable("token") String token) {
-        System.out.println("🔍 Received token: " + token);
         BookingResponseDTO response = service.getBookingByToken(token);
         return ResponseEntity.ok(response);
     }
