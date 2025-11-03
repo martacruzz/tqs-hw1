@@ -100,7 +100,9 @@ public class BookingServiceImpl implements BookingService {
 
         booking.addStatusHistory(newStatus);
         repo.save(booking);
-        logger.info("Booking under token {} was updated to status {}", token, newStatus);
+
+        String safeToken = sanitizeForLog(token);
+        logger.info("Booking under token {} was updated to status {}", safeToken, newStatus);
         return toResponseDTO(booking);
     }
 
