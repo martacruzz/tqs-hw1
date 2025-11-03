@@ -31,6 +31,10 @@ public class BookingServiceImpl implements BookingService {
     private BookingRequestRepo repo;
     private MunicipalityService municipalityService;
 
+    private static final String ERROR_NO_BOOKING_FOUND = "No booking found under token: %s"; // for sonar issue on
+                                                                                             // repeating the same error
+                                                                                             // over and over
+
     @Autowired
     public BookingServiceImpl(BookingRequestRepo repo, MunicipalityService municipalityService) {
         this.repo = repo;
@@ -67,14 +71,14 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingResponseDTO getBookingByToken(String token) {
         BookingRequest booking = repo.findByToken(token)
-                .orElseThrow(() -> new InvalidBookingException("No booking found under token: " + token));
+                .orElseThrow(() -> new InvalidBookingException(String.format(ERROR_NO_BOOKING_FOUND, token)));
         return toResponseDTO(booking);
     }
 
     @Override
     public void cancelBookingByToken(String token) {
         BookingRequest booking = repo.findByToken(token)
-                .orElseThrow(() -> new InvalidBookingException("No booking found under token: " + token));
+                .orElseThrow(() -> new InvalidBookingException(String.format(ERROR_NO_BOOKING_FOUND, token)));
 
         if (!booking.getStatus().canTransition(Status.CANCELLED)) {
             throw new InvalidBookingException("Cannot cancel booking in status: " + booking.getStatus());
@@ -90,7 +94,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingResponseDTO updateBookingStatus(String token, Status newStatus) {
         BookingRequest booking = repo.findByToken(token)
-                .orElseThrow(() -> new InvalidBookingException("No booking found under token: " + token));
+                .orElseThrow(() -> new InvalidBookingException(String.format(ERROR_NO_BOOKING_FOUND, token)));
 
         if (!booking.getStatus().canTransition(newStatus)) {
             throw new InvalidBookingException(
